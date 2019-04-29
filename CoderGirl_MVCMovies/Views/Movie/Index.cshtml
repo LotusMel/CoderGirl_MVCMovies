@@ -4,12 +4,11 @@
 }
 
 <h1>Movies</h1>
-<a asp-controller="Movie" asp-action="Create"></a>
+<a asp-controller="Movie" asp-action="Create">Add New Movie</a>
 <table>
     <tr>
         <th>Movie Name</th>
     </tr>
-    
     @foreach (var movie in ViewBag.Movies)
     {
         <tr>
@@ -17,4 +16,3 @@
         </tr>
     }
 </table>
-
