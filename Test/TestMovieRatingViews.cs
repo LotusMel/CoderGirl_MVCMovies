@@ -12,6 +12,7 @@ using System.Linq;
 
 namespace Test
 {
+    [TestCaseOrderer("Test.PriorityOrderer", "Test")]
     public class TestMovieRatingViews : IDisposable
     {
         private ChromeDriver driver;
@@ -23,32 +24,75 @@ namespace Test
             driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
-        [Theory]
-        [InlineData("Star Wars", "5")]
-        [InlineData("Princess Bride", "4")]
-        public void TestCreateRating(string name, string rating)
+        [Theory, TestPriority(1)]
+        [InlineData("Star Wars", "Lucas", "1976")]
+        [InlineData("Princess Bride", "Reiner", "1987")]
+        public void TestCreateMovie(string name, string director, string year)
         {
             //add movies to data
-            driver.Url = BASE_URL + "movie/create";
-            driver.FindElementByName("movieName").SendKeys(name);
+            driver.Url = BASE_URL + "/movie/create";
+            driver.FindElementByName("Name").SendKeys(name);
+            driver.FindElementByName("Director").SendKeys(director);
+            driver.FindElementByName("Year").SendKeys(year);
+            var movieForm = driver.FindElementByTagName("form");
+            var movieSubmit = movieForm.FindElement(By.TagName("button"));
+            movieSubmit.Click();
 
+            //verify it redirects to Index
+            Assert.Equal(Uri.EscapeUriString(BASE_URL + $"/movie"), driver.Url, true);
+
+            //get table rows
+            var rows = driver.FindElementsByTagName("tr");
+            var headers = rows[0].FindElements(By.TagName("th"));
+
+            //Verify the first row has proper headers
+            Assert.Equal("Movie Name", headers[0].Text);
+            Assert.Equal("Director", headers[1].Text);
+            Assert.Equal("Year", headers[2].Text);
+
+            //Verify a row contains expected movie
+            Assert.Contains(rows, row => MovieRowMatches(row, name, director, year));
+        }
+
+        [Theory, TestPriority(2)]
+        [InlineData("Star Wars", "5")]
+        [InlineData("Princess Bride", "4")]
+        public void TestCreateMovieRating(string name, string rating)
+        {
             //navigate to add movie rating page and get elements
             driver.Url = BASE_URL + "/movierating/create";
-            var submit = driver.FindElementByTagName("button");
+            var form = driver.FindElementByTagName("form");
+            var submit = form.FindElement(By.TagName("button"));
             Assert.Equal("submit", submit.GetAttribute("type"));
-            var movieSelectInput = new SelectElement(driver.FindElementByName("rating"));
-            var ratingSelectInput = new SelectElement(driver.FindElementByName("rating"));
+            Assert.Equal("Rate Movie", submit.Text);
+            var movieSelectInput = new SelectElement(driver.FindElementByName("Movie"));
+            var ratingSelectInput = new SelectElement(driver.FindElementByName("Rating"));
 
             //make selections for input and submit
             movieSelectInput.SelectByText(name);
             ratingSelectInput.SelectByText(rating);
             submit.Click();
 
-            //verify it redirects with correct query string values
-            Assert.Equal(Uri.EscapeUriString(BASE_URL + $"/movierating/details?movieName={name}&rating={rating}"), driver.Url, true);
+            //verify it redirects to Index
+            Assert.Equal(Uri.EscapeUriString(BASE_URL + $"/movierating"), driver.Url, true);
+        }
 
-            //navigate to movie rating list page and get table rows
+
+        [Theory, TestPriority(3)]
+        [InlineData("Star Wars", "5")]
+        [InlineData("Princess Bride", "4")]
+        public void TestMovieRatingIndexPage(string name, string rating)
+        {
+            //navigate to movie rating list page
             driver.Url = BASE_URL + "/movierating";
+
+            //verify link to /MovieRating/Create exists and is correct
+            var linkToCreate = driver.FindElementById("add-movierating");
+            Assert.NotNull(linkToCreate);
+            Assert.Equal("a", linkToCreate.TagName);
+            Assert.Equal("Rate a Movie", linkToCreate.Text);
+
+            //get table rows
             var rows = driver.FindElementsByTagName("tr");
             var headers = rows[0].FindElements(By.TagName("th"));
 
@@ -57,14 +101,80 @@ namespace Test
             Assert.Equal("Rating", headers[1].Text);
 
             //Verify a row contains expected movie/rating combo
-            Assert.Contains(rows, row => RowMatches(row, name, rating));
+            Assert.Contains(rows, row => MovieRatingRowMatches(row, name, rating));
         }
 
-        private bool RowMatches(IWebElement row, string name, string rating)
+        [Theory, TestPriority(5)]
+        [InlineData("Star Wars", "5")]
+        [InlineData("Princess Bride", "4")]
+        public void TestDeleteMovieRating(string name, string rating)
         {
-            var tdElements = row.FindElements(By.TagName("tr"));
+            //navigate to movie rating list page
+            driver.Url = BASE_URL + "/movierating";
+        }
+
+        [Theory, TestPriority(4)]
+        [InlineData("Star Wars", "5", "3")]
+        [InlineData("Princess Bride", "4", "5")]
+        public void TestEditMovieRating(string name, string rating, string newRating)
+        {
+            //navigate to movie rating list page
+            driver.Url = BASE_URL + "/movierating";
+
+            //get table rows
+            var rows = driver.FindElementsByTagName("tr");
+            var headers = rows[0].FindElements(By.TagName("th"));
+
+            //get row for test items and click Edit link
+            var testRow = rows.Single(r => MovieRatingRowMatches(r, name, rating));
+            var editLink = testRow.FindElement(By.LinkText("Edit"));
+            var itemId = GetRouteValueForLink(editLink);
+
+            //click Edit and verify we are at correct page
+            editLink.Click();
+            Assert.Contains(Uri.EscapeUriString(BASE_URL + $"/movierating/edit/"), driver.Url.ToLower());
+
+            //get elements, try to change name and rating
+            var formElement = driver.FindElementByTagName("form");
+            var movieInput = formElement.FindElement(By.Id("Movie"));
+            var ratingInput = new SelectElement(formElement.FindElement(By.Id("Rating")));
+            movieInput.SendKeys("test");
+            ratingInput.SelectByText(newRating);
+
+            //get submit button, verify and click
+            var submitButton = formElement.FindElement(By.TagName("button"));
+            Assert.Equal("Save Changes", submitButton.Text);
+            submitButton.Click();
+
+            //verify it redirects to Index
+            Assert.Equal(Uri.EscapeUriString(BASE_URL + $"/movierating"), driver.Url, true);
+
+            //find row with same id and verify it is updated
+            rows = driver.FindElementsByTagName("tr");
+            var updatedRow = rows.
+
+        }
+
+        private object GetRouteValueForLink(IWebElement editLink)
+        {
+            var action = editLink.GetAttribute("action").ToString();
+            return action.Substring(action.LastIndexOf("/") + 1);
+        }
+
+        private bool MovieRatingRowMatches(IWebElement row, string name, string rating)
+        {
+            var tdElements = row.FindElements(By.TagName("td"));
+            if (tdElements.Count < 2) return false;
 
             return tdElements[0].Text == name && tdElements[1].Text == rating;
+        }
+
+        private bool MovieRowMatches(IWebElement row, string name, string director, string year)
+        {
+            var tdElements = row.FindElements(By.TagName("td"));
+            if (tdElements.Count < 2) return false;
+
+            return tdElements[0].Text == name && tdElements[1].Text == director && tdElements[2].Text == year;
         }
 
         public void Dispose()
