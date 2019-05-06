@@ -7,8 +7,8 @@ namespace CoderGirl_MVCMovies.Data
 {
     public static class RepositoryFactory
     {
-        private static IMovieRatingRepository movieRatingRepository;
-        private static IMovieRepository movieRepository;
+        public static IMovieRatingRepository movieRatingRepository;
+        public static IMovieRepository movieRepository;
 
         public static IMovieRepository GetMovieRepository()
         {

@@ -9,7 +9,7 @@ namespace CoderGirl_MVCMovies.Controllers
 {
     public class MovieRatingController : Controller
     {
-        private IMovieRatingRepository repository = RepositoryFactory.GetMovieRatingRepository();
+        private IMovieRatingRepository repository = RepositoryFactory.movieRatingRepository;
 
         private string htmlForm = @"
             <form method='post'>

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    interface IMovieRepository
+    public interface IMovieRepository
     {
-        int Save(Movie movie);
+        int Save(movie);
 
         List<Movie> GetMovies();
     }
