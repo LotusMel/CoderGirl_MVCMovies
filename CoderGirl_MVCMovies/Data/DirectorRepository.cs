@@ -1,15 +1,13 @@
-﻿using CoderGirl_MVCMovies.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using CoderGirl_MVCMovies.Models;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    public class DirectorRepository : IDirectorRepository
+    internal class DirectorRepository : IDirectorRepository
     {
-        static List<Director> directors = new List<Director>();
-        static int nextId = 1;
+        private List<Director> directors = new List<Director>();
+        private static int nextId = 1;
 
         public void Delete(int id)
         {
@@ -35,11 +33,6 @@ namespace CoderGirl_MVCMovies.Data
 
         public void Update(Director director)
         {
-            //there are many ways to accomplish this, this is just one possible way
-            //the upside is that it is relatively simple, 
-            //the (possible) downside is that it doesn't preserve the order in the list
-            //as the AC doesn't specify, I am going with the simpler solution
-            //once we start using the database this pattern will be simplified
             this.Delete(director.Id);
             directors.Add(director);
         }
