@@ -4,7 +4,7 @@ using CoderGirl_MVCMovies.Models;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    public class DirectorRepository : IDirectorRepository
+    internal class DirectorRepository : IDirectorRepository
     {
         private List<Director> directors = new List<Director>();
         private static int nextId = 1;
