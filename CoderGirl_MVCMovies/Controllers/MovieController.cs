@@ -29,6 +29,12 @@ namespace CoderGirl_MVCMovies.Controllers
         [HttpPost]
         public IActionResult Create(Movie movie)
         {
+            if (String.IsNullOrWhiteSpace(movie.Name))
+            {
+                ModelState.AddModelError("Name", "Name must be included");
+                ViewBag.Directors = directorRepository.GetDirectors();
+                return View(movie);
+            }
             movieRepository.Save(movie);
             return RedirectToAction(actionName: nameof(Index));
         }
