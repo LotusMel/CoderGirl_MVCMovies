@@ -3,24 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoderGirl_MVCMovies.Models;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    public class MovieRepository : IMovieRespository
+    public class MovieRepository : BaseRepository
     {
-        static List<Movie> movies = new List<Movie>();
-        static int nextId = 1;
+        
         static IMovieRatingRepository ratingRepository = RepositoryFactory.GetMovieRatingRepository();
         static IDirectorRepository directorRepository = RepositoryFactory.GetDirectorRepository();
 
-        public void Delete(int id)
+        
+        public override IModel GetById(int id)
         {
-            movies.RemoveAll(m => m.Id == id);
-        }
-
-        public Movie GetById(int id)
-        {
-            Movie movie = movies.SingleOrDefault(m => m.Id == id);
+            Movie movie = (Movie)base.GetById(id);
             movie = SetMovieRatings(movie);
             movie = SetDirectorName(movie);
             return movie;

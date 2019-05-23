@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    public class MovieRatingRepository : IMovieRatingRepository
+    public class MovieRatingRepository : BaseRepository
     {
         private static List<MovieRating> movieRatings = new List<MovieRating>();
         private static int nextId = 1;
