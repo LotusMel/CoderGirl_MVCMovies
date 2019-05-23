@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using CoderGirl_MVCMovies.Controllers;
 
 namespace CoderGirl_MVCMovies.Controllers
 {
     public class MovieRatingController : Controller
     {
+        private string htmlForm = @"<form method=post/>
+                                    <input="
+
+
         public IActionResult Index()
         {
             return View();
