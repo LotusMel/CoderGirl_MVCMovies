@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CoderGirl_MVCMovies.Data
 {
-    public static class RepositoryFactory
+    public static class RepositoryFactory 
     {
         private static IMovieRatingRepository movieRatingRepository;
         private static IMovieRespository movieRepository;
