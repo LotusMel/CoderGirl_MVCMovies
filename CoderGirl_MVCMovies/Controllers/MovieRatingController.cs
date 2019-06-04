@@ -21,10 +21,22 @@ namespace CoderGirl_MVCMovies.Controllers
                                         <button type='submit'>Rate Movie</button>
                                      </form>";
 
-
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Create()
         {
-            return View();
+            return Content(htmlForm, "text/html");
+        }
+
+        [HttpPost]
+        public IActionResult Create (string movieName, string rating)
+        {
+            return RedirectToAction(actionName: nameof(Details), routeValues: new {movieName, rating});
+        }
+
+        [HttpGet]
+        public IActionResult Details(string movieName, string rating)
+        {
+            return Content($"{movieName} has a rating of {rating}");
         }
 
         //Create a string html template for a form
