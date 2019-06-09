@@ -7,8 +7,8 @@ namespace CoderGirl_MVCMovies.Data
 {
     public interface IMovieRepository
     {
-        int Save(movie);
+        int Save();
 
-        List<Movie> GetMovies();
+        List<MovieRepository> GetMovies();
     }
 }

@@ -9,11 +9,11 @@ namespace CoderGirl_MVCMovies.Controllers
 {
     public class MovieController : Controller
     {
-        public static IMovieRepository movieRepository = RepositoryFactory.GetMovieRepository();
-
+        public static Dictionary<int, string> movies = new Dictionary<int, string>();
+        public static int nextIDToUse = 1;
         public IActionResult Index()
         {
-            ViewBag.Movies = movieRepository;
+            ViewBag.Movies = movies;
             return View();
         }
 
@@ -24,9 +24,10 @@ namespace CoderGirl_MVCMovies.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Movie movie)
+        public IActionResult Create(string movie)
         {
-            movieRepository.Save(movie);
+            movies.Add(nextIDToUse, movie);
+            nextIDToUse++;
             return RedirectToAction(actionName: nameof(Index));
         }
     }

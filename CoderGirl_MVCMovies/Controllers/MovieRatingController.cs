@@ -11,18 +11,7 @@ namespace CoderGirl_MVCMovies.Controllers
     {
         private IMovieRatingRepository repository = RepositoryFactory.movieRatingRepository;
 
-        private string htmlForm = @"
-            <form method='post'>
-                <input name='movieName' />
-                <select name='rating'>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>                    
-                </select>
-                <button type='submit'>Rate it</button>
-            </form>";
+        
 
         /// TODO: Create a view Index. This view should list a table of all saved movie names with associated average rating
         /// TODO: Be sure to include headers for Movie and Rating
@@ -38,7 +27,7 @@ namespace CoderGirl_MVCMovies.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.Movies = MovieController.movieRepository;
+            ViewBag.Movies = MovieController.movies;
             return View();
         }
 
